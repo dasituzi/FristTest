@@ -162,7 +162,7 @@ class TCPServer():
 
 
 if __name__ == "__main__":
-    h = HttpConnect("192.168.16.49:3331","POST","/mgmt?cmd=getms")
+    h = HttpConnect("192.168.16.49",3331,"POST","/mgmt?cmd=getms")
     print h.getVersion()
 
     
