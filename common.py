@@ -19,11 +19,12 @@ class HttpConnect():
 
     '''
 
-    def __init__(self,ip,port,method,url):
-        self.ip = ip
-        self.port = port
+    def __init__(self,addr,method,url):
+        self.addr = addr
         self.method = method
         self.url = url
+        self.return_data = ''
+
         #{'key1':'value1','key2':'value2' ...}
         self.params = urllib.urlencode("")
         self.headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -34,7 +35,7 @@ class HttpConnect():
                         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0'
                         }
         try:
-            self.conn = httplib.HTTPConnection(self.ip,self.port,10)
+            self.conn = httplib.HTTPConnection(self.addr)
 
             if self.method == "GET":
                 self.conn.request('GET',self.url)               
@@ -43,6 +44,7 @@ class HttpConnect():
                 print "use POST"
 
             self.response = self.conn.getresponse()
+            self.return_data = self.response.read()
 
         except Exception,e:
             print e
@@ -51,7 +53,7 @@ class HttpConnect():
                 self.conn.close()
 
     def getResponse(self):
-        return self.response.read()
+        return self.return_data
 
     def getVersion(self):
         return self.response.version
