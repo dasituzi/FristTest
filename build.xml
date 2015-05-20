@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<project name="junit-test"  default="test" basedir="."> 
+    <property name="src.dir" value="src"/>
+    <property name="bin.dir"   value="bin"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="classes.dir" value="${bin.dir}"/>
+    <property name="report.dir" value="report"/>
+    <property name="tar.report.dir" value="tar"/>
+    <property name="DEBUG" value="false" />
+    <path id="JUnit4.libraryclasspath">
+        <pathelement location="${lib.dir}/junit.jar"/>
+        <pathelement location="${lib.dir}/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+        <!-- copy from following path
+        <pathelement location="D:/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar"/>
+        <pathelement location="D:/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+        -->
+    </path>
+
+    <!-- use for send mail -->
+    <!-- you should copy them to ANT_HOME/lib !!! -->
+    <!--
+    <path id="Mail.libraryclasspath">
+        <pathelement location="${lib.dir}/mail.jar"/>
+        <pathelement location="${lib.dir}/activation.jar"/>
+        <pathelement location="${lib.dir}/commons-email-1.2jar"/>
+    </path>
+    -->
+
+    <!-- start order -->
+    <target name="test" depends="init, compile ,run ,make-zip,mail">
+        <echo message="Finished running tests."/>
+    </target>
+
+    <!-- init -->
+    <target name="init">
+        <delete dir="${bin.dir}"/>
+        <delete dir="${report.dir}"/>
+        <mkdir dir="${classes.dir}"/> 
+        <mkdir dir="${report.dir}"/> 
+        <mkdir dir="${tar.report.dir}"/> 
+    </target>
+
+    <!-- compile -->
+    <target name="compile">
+        <javac target="1.7" srcdir="${src.dir}" destdir="${bin.dir}" debug="${DEBUG}" includeantruntime="no">
+            <classpath refid="JUnit4.libraryclasspath"/>
+        </javac>
+    </target>
+
+    <!-- junit test -->
+    <target name="run">
+        <junit fork="yes" forkmode="perTest" printsummary="no" haltonfailure="no" haltonerror="false" showoutput="true">
+            <classpath location="${classes.dir}"/>
+            <classpath refid="JUnit4.libraryclasspath"/>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}">
+                <fileset dir="${classes.dir}">
+                    <include name="*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <echo message="junit tests done."/>
+
+        <!-- report from xml to html -->
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${report.dir}"/>
+        </junitreport>
+        <echo message="report done." />
+    </target>
+
+    <!-- tar report -->
+    <target name="make-zip">
+        <tstamp>
+            <!-- make date format -->
+            <format property="date" pattern="yyyyMMddHHmmss" locale="cn" />
+        </tstamp>
+        <jar jarfile="${tar.report.dir}/test-report.${date}.zip" encoding="utf-8" basedir="${report.dir}" 
+            includes="*.html" excludes="*.xml"/>
+        <echo message="tar done." />
+    </target>
+
+    <!-- send mail -->
+    <target name="mail">
+        <mail messageMimeType="text/html" mailhost="mail.xxx.com" user="xxx\qa-pub" password="xxx" mailport="25" subject="junit-test-report" messagefile="${report.dir}/junit-noframes.html">
+            <from address="xxx@xxx.com"/>
+            <to address="xxx@xxx.com"/>
+            <fileset dir="${tar.report.dir}" erroronmissingdir="false">
+                <include name="test-report.${date}.zip" />
+            </fileset>
+        </mail>
+        <echo message="send mail done." />
+    </target>
+</project>
+
