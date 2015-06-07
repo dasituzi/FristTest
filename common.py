@@ -132,7 +132,7 @@ class TCPServer():
             self.sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             self.sock.bind(self.addr)
             self.sock.listen(100)
-            print "start, waiting for connect!"
+            print "start TCPServer with : "+str(self.host)+":"+str(self.port)+"\r\nwaiting for connect!"
         except:
             print "create socket error!"
             sys.exit()
@@ -160,6 +160,45 @@ class TCPServer():
     def test(self):
         print "test"
 
+class TestClient():
+
+    '''
+    GET method :
+    d = TestClient("192.168.16.49",12223,"GET","/mgmt?cmd=getms")
+    d.reqGET()
+
+    POST method :
+
+    '''
+
+    def __init__(self,host,port,method,url):
+        self.host=host
+        self.port=port
+        self.method=method
+        self.url=url
+        self.addr=(self.host,self.port)
+        try:
+            self.s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            self.s.connect(self.addr)
+        except Exception,e:
+            print e
+            print "create socket error!"
+            sys.exit()
+
+    def reqGET(self):
+        try:
+            self.get_url= self.method+" "+self.url+" HTTP/1.1\r\n\r\n"
+            self.s.send(self.get_url)
+            self.recv = self.s.recv(1024)
+            print self.recv
+        except Exception,e:
+            print "connect failed"
+            print e
+        finally:
+            self.s.close()
+
+    def reqPOST(self):
+        pass
 
 if __name__ == "__main__":
     h = HttpConnect("jsonview.com:80","GET","/example.json")
