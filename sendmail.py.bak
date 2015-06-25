@@ -8,10 +8,10 @@ import smtplib
 import os
 
 
-server ={'name':'','user':'','passwd':''}
-fro = ''
-to =['']
-cc =['']
+server ={'name':'mail.funshion.com','user':'qa-fireflies','passwd':'nihao123!'}
+fro = 'qa-fireflies@funshion.com'
+to =['xiongsp@funshion.com']
+cc =['liuyang1@funshion.com']
 subject = 'Linda_0.2.6Web_ATDD TestResult'
 file_result =open('/var/www/Linda026/result.txt','r').read()
 text = file_result  
